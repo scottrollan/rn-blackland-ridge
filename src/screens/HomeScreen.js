@@ -34,11 +34,17 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.buttonTextStyles}>Discussion</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => navigation.navigate('Loading')}
         style={styles.buttonStyles}
       >
         <Text style={styles.buttonTextStyles}>Loading</Text>
+      </TouchableOpacity> */}
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Zillow')}
+        style={styles.buttonStyles}
+      >
+        <Text style={styles.buttonTextStyles}>Homes by Zillow</Text>
       </TouchableOpacity>
       <View style={{ width: '100%', display: thisUser ? 'none' : 'flex' }}>
         <TouchableOpacity

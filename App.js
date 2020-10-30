@@ -7,6 +7,7 @@ import DiscussionScreen from './src/screens/DiscussionScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import { UserProvider } from './src/context/UserContext';
+import ZillowScreen from './src/screens/ZillowScreen';
 
 const navigator = createStackNavigator(
   {
@@ -15,6 +16,7 @@ const navigator = createStackNavigator(
     Home: HomeScreen,
     Directory: DirectoryScreen,
     Discussion: DiscussionScreen,
+    Zillow: ZillowScreen,
   },
   {
     initialRouteName: 'Home',

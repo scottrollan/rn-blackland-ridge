@@ -8,6 +8,7 @@ const colors = {
   cautionOrange: '#ff6700',
   defaultFontColor: '#1b4a56',
   white: '#fafafa',
+  overlayLight: 'rgba(255, 255, 255, 0.5)',
 };
 
 export default colors;
