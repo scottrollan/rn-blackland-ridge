@@ -7,6 +7,7 @@ import {
   LayoutAnimation,
   UIManager,
 } from 'react-native';
+import { Icon } from 'react-native-elements';
 import { colors } from '../styles';
 
 export default function Accordion({ data }) {
@@ -19,9 +20,19 @@ export default function Accordion({ data }) {
 
   return (
     <View>
-      <TouchableOpactiy>
+      <TouchableOpactiy style={styles.row} onPress={() => toggleExpand()}>
         <Text>TESTING</Text>
+        <Icon
+          name={expanded ? 'chevron-up' : 'chevron-down'}
+          type="font-awesome-5"
+          color={state.liked ? colors.facebookBlue : '#999999'}
+        />
       </TouchableOpactiy>
+      <View style={styles.parentHr}>
+        {expanded && 
+        <View style={styles.child}>
+         <Text>DATA WILL GO HERE, PROBABLY IN A FLATLIST</Text>
+      </View>}
     </View>
   );
 }
