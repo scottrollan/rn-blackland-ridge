@@ -29,10 +29,12 @@ export default function Accordion({ data }) {
         />
       </TouchableOpactiy>
       <View style={styles.parentHr}>
-        {expanded && 
-        <View style={styles.child}>
-         <Text>DATA WILL GO HERE, PROBABLY IN A FLATLIST</Text>
-      </View>}
+        {expanded && (
+          <View style={styles.child}>
+            <Text>DATA WILL GO HERE, PROBABLY IN A FLATLIST</Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 }
