@@ -25,6 +25,11 @@ export const fetchMessages = async () => {
   return response;
 };
 
+export const fetchSingleMessage = async (id) => {
+  let response = await Client.fetch(`*[_type == 'message' && _id == '${id}']`);
+  return response;
+};
+
 export const fetchReferrals = async () => {
   try {
     let response = await Client.fetch("*[_type == 'referral']");

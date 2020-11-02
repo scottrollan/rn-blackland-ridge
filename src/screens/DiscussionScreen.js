@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import ProfilePic from '../components/ProfilePic';
 import ReactionRow from '../components/ReactionRow';
-import { fetchMessages, builderImageUrl } from '../api/sanityClient';
-import { Text, View, FlatList, StyleSheet } from 'react-native';
-import { Card, Icon, Tooltip } from 'react-native-elements';
+import { createParsedDate } from '../functions/CreateParsedDate';
+import {
+  fetchMessages,
+  fetchSingleMessage,
+  builderImageUrl,
+} from '../api/sanityClient';
+import { createRandomString } from '../functions/CreateRandomString';
+import { sortByCreatedAt } from '../functions/SortDates';
+import {
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
+import { Card, Icon, Tooltip, Overlay, Avatar } from 'react-native-elements';
 import colors from '../styles';
 
 const urlFor = (source) => {
@@ -12,17 +25,43 @@ const urlFor = (source) => {
 
 export default function DiscussionScreen() {
   const [messages, setMessages] = useState([]);
+  const [expanded, setExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setExpanded(!expanded);
+  };
 
   useEffect(() => {
-    const getMessages = async () => {
+    const fetchNewThreads = async () => {
       try {
         const response = await fetchMessages();
-        setMessages([...response]);
+        // setMessages(response);
+
+        let newThreads = response.filter((mess) => mess.newThread);
+        newThreads.forEach((m) => {
+          if (m.responses) {
+            let replyArray = [];
+            m.responses.forEach(async (obj) => {
+              const ref = obj._ref;
+              try {
+                const res = await fetchSingleMessage(ref);
+                const thisReply = res[0];
+                replyArray = [...replyArray, thisReply];
+                replyArray = replyArray.sort(sortByCreatedAt);
+                m.responses = replyArray;
+                setMessages(newThreads);
+                console.log(newThreads);
+              } catch (error) {
+                console.log(error);
+              }
+            });
+          }
+        });
       } catch (error) {
         console.log(error);
       }
     };
-    getMessages();
+    fetchNewThreads();
   }, []);
 
   return (
@@ -32,6 +71,7 @@ export default function DiscussionScreen() {
         <FlatList
           showsVerticalScrollIndicator={false}
           keyExtractor={(message) => message._id}
+          listKey={createRandomString(22)}
           data={messages}
           renderItem={({ item }) => {
             const imageURL = urlFor(item.avatar);
@@ -57,6 +97,44 @@ export default function DiscussionScreen() {
             if (weCry) {
               crys = weCry.length;
             }
+
+            const renderReactions = (
+              <View style={styles.interactions}>
+                <Tooltip popover={<Text>{likes} Likes</Text>}>
+                  <Icon
+                    style={{ display: likes > 0 ? 'flex' : 'none' }}
+                    name="thumbs-up"
+                    type="font-awesome-5"
+                    color={colors.facebookBlue}
+                  ></Icon>
+                </Tooltip>
+                <Tooltip popover={<Text>{loves} Loves</Text>}>
+                  <Icon
+                    style={{ display: loves > 0 ? 'flex' : 'none' }}
+                    name="heart"
+                    solid
+                    type="font-awesome-5"
+                    color={colors.googleRed}
+                  ></Icon>
+                </Tooltip>
+                <Tooltip popover={<Text>{crys} Sad Faces</Text>}>
+                  <Icon
+                    style={{ display: crys > 0 ? 'flex' : 'none' }}
+                    name="sad-tear"
+                    type="font-awesome-5"
+                    color={colors.cautionOrange}
+                  ></Icon>
+                </Tooltip>
+                <Tooltip popover={<Text>{laughs} Haha's</Text>}>
+                  <Icon
+                    style={{ display: laughs > 0 ? 'flex' : 'none' }}
+                    name="laugh"
+                    type="font-awesome-5"
+                    color={colors.cautionYellow}
+                  ></Icon>
+                </Tooltip>
+              </View>
+            );
             return (
               <View
                 style={{
@@ -86,42 +164,6 @@ export default function DiscussionScreen() {
                       }}
                     ></FlatList>
                   </View>
-                  <View style={styles.interactions}>
-                    <Tooltip popover={<Text>{likes} Likes</Text>}>
-                      <Icon
-                        style={{ display: likes > 0 ? 'flex' : 'none' }}
-                        name="thumbs-up"
-                        type="font-awesome-5"
-                        color={colors.facebookBlue}
-                      ></Icon>
-                    </Tooltip>
-                    <Tooltip popover={<Text>{loves} Loves</Text>}>
-                      <Icon
-                        style={{ display: loves > 0 ? 'flex' : 'none' }}
-                        name="heart"
-                        solid
-                        type="font-awesome-5"
-                        color={colors.googleRed}
-                      ></Icon>
-                    </Tooltip>
-                    <Tooltip popover={<Text>{crys} Sad Faces</Text>}>
-                      <Icon
-                        style={{ display: crys > 0 ? 'flex' : 'none' }}
-                        name="sad-tear"
-                        type="font-awesome-5"
-                        color={colors.cautionOrange}
-                      ></Icon>
-                    </Tooltip>
-                    <Tooltip popover={<Text>{laughs} Haha's</Text>}>
-                      <Icon
-                        style={{ display: laughs > 0 ? 'flex' : 'none' }}
-                        name="laugh"
-                        type="font-awesome-5"
-                        color={colors.cautionYellow}
-                      ></Icon>
-                    </Tooltip>
-                  </View>
-                  <Card.Divider />
                   <ReactionRow
                     id={item._id}
                     likedBy={item.likedBy}
@@ -129,6 +171,71 @@ export default function DiscussionScreen() {
                     criedBy={item.criedBy}
                     laughedBy={item.laughedBy}
                   />
+
+                  <Card.Divider />
+                  <TouchableOpacity
+                    onPress={() => toggleExpand()}
+                    style={{
+                      width: '100%',
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <View onPress={(e) => e.stopPropagation()}>
+                      {renderReactions}
+                    </View>
+                    <Icon
+                      name={expanded ? 'chevron-up' : 'chevron-down'}
+                      type="font-awesome-5"
+                    />
+                  </TouchableOpacity>
+                  <View style={{ display: expanded ? 'flex' : 'none' }}>
+                    <FlatList //gets a list of reponse refs
+                      showsVerticalScrollIndicator={false}
+                      data={item.responses}
+                      keyExtractor={(r) => (r ? r._id : createRandomString(11))}
+                      listKey={createRandomString(20)}
+                      renderItem={({ item }) => {
+                        //for each ref,
+                        const date = new Date(item._createdAt);
+                        const originalPostDate = createParsedDate(date);
+                        const avatarUrl = urlFor(item.avatar);
+                        return (
+                          <View style={styles.responseStyles}>
+                            <Avatar
+                              rounded
+                              size="small"
+                              source={{
+                                uri: `${avatarUrl}`,
+                              }}
+                            />
+                            <Tooltip
+                              width={250}
+                              popover={<Text>{originalPostDate}</Text>}
+                            >
+                              <View style={styles.quoteBoxStyles}>
+                                <Text>{item.authorName} said:</Text>
+                                <FlatList
+                                  data={item.message}
+                                  keyExtractor={(p) => p._key}
+                                  listKey={createRandomString(14)}
+                                  renderItem={({ item }) => {
+                                    return (
+                                      <View style={{ flexDirection: 'row' }}>
+                                        <Text style={styles.quoteTextStyles}>
+                                          {item.children[0].text}
+                                        </Text>
+                                      </View>
+                                    );
+                                  }}
+                                ></FlatList>
+                              </View>
+                            </Tooltip>
+                          </View>
+                        );
+                      }}
+                    ></FlatList>
+                  </View>
                 </Card>
               </View>
             );
@@ -143,6 +250,7 @@ const styles = StyleSheet.create({
   pageStyles: {
     alignItems: 'center',
     width: '100%',
+    paddingBottom: 60,
   },
   headerStyles: {
     fontSize: 25,
@@ -170,5 +278,27 @@ const styles = StyleSheet.create({
   interactions: {
     flexDirection: 'row',
     marginBottom: 10,
+  },
+  responseStyles: {
+    flexDirection: 'row',
+  },
+  dateTooltipStyles: {
+    width: '65vw',
+  },
+  quoteBoxStyles: {
+    maxWidth: '95%',
+    marginTop: 12,
+    marginBottom: 2,
+    marginLeft: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderRadius: 18,
+    borderTopLeftRadius: 0,
+    borderColor: colors.overlayDark,
+    backgroundColor: colors.overlayMedium,
+  },
+  quoteTextStyles: {
+    fontStyle: 'italic',
   },
 });

@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { Icon } from 'react-native-elements';
 import colors from '../styles';
 
