@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProfilePic from '../components/ProfilePic';
+import ImageDisplay from '../components/ImageDisplay';
 import ReactionRow from '../components/ReactionRow';
 import RecordedReactions from '../components/RecordedReactions';
 import Message from '../components/Message';
@@ -72,7 +73,8 @@ export default function DiscussionScreen() {
           listKey={createRandomString(22)}
           data={messages}
           renderItem={({ item }) => {
-            const imageURL = urlFor(item.avatar);
+            const avatarURL = urlFor(item.avatar);
+            const imageURL = urlFor(item.image);
             return (
               <View
                 style={{
@@ -80,9 +82,11 @@ export default function DiscussionScreen() {
                   display: item.newThread ? 'flex' : 'none',
                 }}
               >
+                {/* ---------- HEADER ---------- */}
+                {/* ---------- NEW THREAD POST ---------- */}
                 <Card style={styles.cardStyles}>
                   <View style={styles.cardTitleStyles}>
-                    <ProfilePic imageURL={imageURL} />
+                    <ProfilePic profileURL={avatarURL} />
                     <Text style={{ marginLeft: 10, fontSize: 20 }}>
                       {item.title}
                     </Text>
@@ -102,6 +106,8 @@ export default function DiscussionScreen() {
                       }}
                     ></FlatList>
                   </View>
+                  <ImageDisplay imageURL={imageURL} height={200} width={250} />
+
                   <ReactionRow
                     id={item._id}
                     likedBy={item.likedBy}

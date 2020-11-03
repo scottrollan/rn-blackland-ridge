@@ -112,7 +112,7 @@ export default function DirectoryScreen() {
                   </Text>
                 </View>
                 <ProfilePic
-                  imageURL={imageURL}
+                  profileURL={imageURL}
                   // imageSource={require(item.image)}
                 />
               </View>

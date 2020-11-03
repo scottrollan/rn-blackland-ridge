@@ -1,18 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ProfilePic from './ProfilePic';
+import ImageDisplay from './ImageDisplay';
 import { createRandomString } from '../functions/CreateRandomString';
 import { createParsedDate } from '../functions/CreateParsedDate';
 import { builderImageUrl } from '../api/sanityClient';
-import {
-  TouchableOpacity,
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  Image,
-  StyleSheet,
-} from 'react-native';
-import { Tooltip, Overlay } from 'react-native-elements';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { Tooltip } from 'react-native-elements';
 import colors from '../styles';
 
 const urlFor = (source) => {
@@ -20,11 +13,6 @@ const urlFor = (source) => {
 };
 
 export default function Reply({ data }) {
-  const [visible, setVisible] = useState(false);
-
-  const toggleOverlay = () => {
-    setVisible(!visible);
-  };
   return (
     <FlatList //gets a list of reponse refs
       showsVerticalScrollIndicator={false}
@@ -37,11 +25,10 @@ export default function Reply({ data }) {
         const originalPostDate = createParsedDate(date);
         const profilePicURL = urlFor(item.avatar);
         let imageURL = urlFor(item.image);
-        console.log(imageURL.options.source);
 
         return (
           <View style={styles.responseStyles}>
-            <ProfilePic imageURL={profilePicURL} />
+            <ProfilePic profileURL={profilePicURL} />
 
             <Tooltip width={250} popover={<Text>{originalPostDate}</Text>}>
               <View style={styles.quoteBoxStyles}>
@@ -56,17 +43,22 @@ export default function Reply({ data }) {
                         <Text style={styles.quoteTextStyles}>
                           {item.children[0].text}
                         </Text>
-                        <View
+                        <ImageDisplay
+                          imageURL={imageURL}
+                          height={150}
+                          width={150}
+                        />
+                        {/* <View
                           style={{
                             display: imageURL.options.source ? 'flex' : 'none',
-                          }}
-                        >
-                          <TouchableOpacity onPress={() => toggleOverlay()}>
+                          }} */}
+                        {/* > */}
+                        {/* <TouchableOpacity onPress={() => toggleOverlay()}>
                             <Image
                               source={{ uri: `${imageURL}` }}
                               style={{
-                                width: 150,
-                                height: 150,
+                                minWidth: 100,
+                                minHeight: 100,
                               }}
                             />
                           </TouchableOpacity>
@@ -81,9 +73,8 @@ export default function Reply({ data }) {
                             style={{ minWidth: '90%', minHeight: '75%' }}
                             resizeMethod="scale"
                             resizeMode="contain"
-                            PlaceholderContent={<ActivityIndicator />}
                           />
-                        </Overlay>
+                        </Overlay> */}
                       </View>
                     );
                   }}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Overlay, Avatar } from 'react-native-elements';
 
-export default function ProfilePic({ imageURL }) {
+export default function ProfilePic({ profileURL }) {
   const [visible, setVisible] = useState(false);
 
   const toggleOverlay = () => {
@@ -12,14 +12,14 @@ export default function ProfilePic({ imageURL }) {
   return (
     <View>
       <TouchableOpacity onPress={toggleOverlay}>
-        <Avatar rounded source={{ uri: `${imageURL}` }} />
+        <Avatar rounded source={{ uri: `${profileURL}` }} />
       </TouchableOpacity>
       <Overlay
         isVisible={visible}
         onBackdropPress={toggleOverlay}
         style={styles.overlayStyles}
       >
-        <Avatar style={styles.imageStyles} source={{ uri: `${imageURL}` }} />
+        <Avatar style={styles.imageStyles} source={{ uri: `${profileURL}` }} />
       </Overlay>
     </View>
   );

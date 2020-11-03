@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
-import { Overlay, Image } from 'react-native-elements';
+import { View, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { Overlay } from 'react-native-elements';
 
-export default function ImageDisplay({ imageURL }) {
+export default function ImageDisplay({ imageURL, height, width }) {
   const [visible, setVisible] = useState(false);
 
   const toggleOverlay = () => {
@@ -16,20 +10,26 @@ export default function ImageDisplay({ imageURL }) {
   };
 
   return (
-    <View>
+    <View style={{ display: imageURL.options.source ? 'flex' : 'none' }}>
       <TouchableOpacity onPress={toggleOverlay}>
         <Image
-          source={{ uri: image }}
-          style={{ width: 200, height: 200 }}
-          PlaceholderContent={<ActivityIndicator />}
-        />{' '}
+          style={{ height: height, width: width }}
+          source={{ uri: `${imageURL}` }}
+          resizeMethod="scale"
+          resizeMode="contain"
+        />
       </TouchableOpacity>
       <Overlay
         isVisible={visible}
         onBackdropPress={toggleOverlay}
         style={styles.overlayStyles}
       >
-        <Avatar style={styles.imageStyles} source={{ uri: `${imageURL}` }} />
+        <Image
+          style={{ minWidth: '90%', minHeight: '75%' }}
+          source={{ uri: `${imageURL}` }}
+          resizeMethod="scale"
+          resizeMode="contain"
+        />
       </Overlay>
     </View>
   );
@@ -38,9 +38,5 @@ export default function ImageDisplay({ imageURL }) {
 const styles = StyleSheet.create({
   overlayStyles: {
     padding: 15,
-  },
-  imageStyles: {
-    height: 250,
-    width: 250,
   },
 });
