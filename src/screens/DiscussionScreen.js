@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ProfilePic from '../components/ProfilePic';
 import ReactionRow from '../components/ReactionRow';
-import { createParsedDate } from '../functions/CreateParsedDate';
+import RecordedReactions from '../components/RecordedReactions';
+import Message from '../components/Message';
 import {
   fetchMessages,
   fetchSingleMessage,
@@ -16,8 +17,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { Card, Icon, Tooltip, Overlay, Avatar } from 'react-native-elements';
-import colors from '../styles';
+import { Card, Icon } from 'react-native-elements';
 
 const urlFor = (source) => {
   return builderImageUrl.image(source);
@@ -35,7 +35,6 @@ export default function DiscussionScreen() {
     const fetchNewThreads = async () => {
       try {
         const response = await fetchMessages();
-        // setMessages(response);
 
         let newThreads = response.filter((mess) => mess.newThread);
         newThreads.forEach((m) => {
@@ -75,66 +74,6 @@ export default function DiscussionScreen() {
           data={messages}
           renderItem={({ item }) => {
             const imageURL = urlFor(item.avatar);
-            const weLike = item.likedBy;
-            let likes;
-            if (weLike) {
-              likes = weLike.length;
-            }
-            const weLove = item.lovedBy;
-            let loves;
-            if (weLove) {
-              loves = weLove.length;
-            }
-
-            const weLaugh = item.laughedBy;
-            let laughs;
-            if (weLaugh) {
-              laughs = weLaugh.length;
-            }
-
-            const weCry = item.criedBy;
-            let crys;
-            if (weCry) {
-              crys = weCry.length;
-            }
-
-            const renderReactions = (
-              <View style={styles.interactions}>
-                <Tooltip popover={<Text>{likes} Likes</Text>}>
-                  <Icon
-                    style={{ display: likes > 0 ? 'flex' : 'none' }}
-                    name="thumbs-up"
-                    type="font-awesome-5"
-                    color={colors.facebookBlue}
-                  ></Icon>
-                </Tooltip>
-                <Tooltip popover={<Text>{loves} Loves</Text>}>
-                  <Icon
-                    style={{ display: loves > 0 ? 'flex' : 'none' }}
-                    name="heart"
-                    solid
-                    type="font-awesome-5"
-                    color={colors.googleRed}
-                  ></Icon>
-                </Tooltip>
-                <Tooltip popover={<Text>{crys} Sad Faces</Text>}>
-                  <Icon
-                    style={{ display: crys > 0 ? 'flex' : 'none' }}
-                    name="sad-tear"
-                    type="font-awesome-5"
-                    color={colors.cautionOrange}
-                  ></Icon>
-                </Tooltip>
-                <Tooltip popover={<Text>{laughs} Haha's</Text>}>
-                  <Icon
-                    style={{ display: laughs > 0 ? 'flex' : 'none' }}
-                    name="laugh"
-                    type="font-awesome-5"
-                    color={colors.cautionYellow}
-                  ></Icon>
-                </Tooltip>
-              </View>
-            );
             return (
               <View
                 style={{
@@ -182,7 +121,7 @@ export default function DiscussionScreen() {
                     }}
                   >
                     <View onPress={(e) => e.stopPropagation()}>
-                      {renderReactions}
+                      <RecordedReactions item={item} />
                     </View>
                     <Icon
                       name={expanded ? 'chevron-up' : 'chevron-down'}
@@ -190,51 +129,7 @@ export default function DiscussionScreen() {
                     />
                   </TouchableOpacity>
                   <View style={{ display: expanded ? 'flex' : 'none' }}>
-                    <FlatList //gets a list of reponse refs
-                      showsVerticalScrollIndicator={false}
-                      data={item.responses}
-                      keyExtractor={(r) => (r ? r._id : createRandomString(11))}
-                      listKey={createRandomString(20)}
-                      renderItem={({ item }) => {
-                        //for each ref,
-                        const date = new Date(item._createdAt);
-                        const originalPostDate = createParsedDate(date);
-                        const avatarUrl = urlFor(item.avatar);
-                        return (
-                          <View style={styles.responseStyles}>
-                            <Avatar
-                              rounded
-                              size="small"
-                              source={{
-                                uri: `${avatarUrl}`,
-                              }}
-                            />
-                            <Tooltip
-                              width={250}
-                              popover={<Text>{originalPostDate}</Text>}
-                            >
-                              <View style={styles.quoteBoxStyles}>
-                                <Text>{item.authorName} said:</Text>
-                                <FlatList
-                                  data={item.message}
-                                  keyExtractor={(p) => p._key}
-                                  listKey={createRandomString(14)}
-                                  renderItem={({ item }) => {
-                                    return (
-                                      <View style={{ flexDirection: 'row' }}>
-                                        <Text style={styles.quoteTextStyles}>
-                                          {item.children[0].text}
-                                        </Text>
-                                      </View>
-                                    );
-                                  }}
-                                ></FlatList>
-                              </View>
-                            </Tooltip>
-                          </View>
-                        );
-                      }}
-                    ></FlatList>
+                    <Message data={item.responses} />
                   </View>
                 </Card>
               </View>
@@ -274,31 +169,5 @@ const styles = StyleSheet.create({
   },
   likeStyles: {
     marginHorizontal: 5,
-  },
-  interactions: {
-    flexDirection: 'row',
-    marginBottom: 10,
-  },
-  responseStyles: {
-    flexDirection: 'row',
-  },
-  dateTooltipStyles: {
-    width: '65vw',
-  },
-  quoteBoxStyles: {
-    maxWidth: '95%',
-    marginTop: 12,
-    marginBottom: 2,
-    marginLeft: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderRadius: 18,
-    borderTopLeftRadius: 0,
-    borderColor: colors.overlayDark,
-    backgroundColor: colors.overlayMedium,
-  },
-  quoteTextStyles: {
-    fontStyle: 'italic',
   },
 });
