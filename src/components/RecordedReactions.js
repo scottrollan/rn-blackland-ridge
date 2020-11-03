@@ -14,13 +14,11 @@ export default function RecordedReactions({ item }) {
   if (weLove) {
     loves = weLove.length;
   }
-
   const weLaugh = item.laughedBy;
   let laughs;
   if (weLaugh) {
     laughs = weLaugh.length;
   }
-
   const weCry = item.criedBy;
   let crys;
   if (weCry) {

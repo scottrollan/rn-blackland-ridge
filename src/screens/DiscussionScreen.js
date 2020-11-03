@@ -49,7 +49,6 @@ export default function DiscussionScreen() {
                 replyArray = replyArray.sort(sortByCreatedAt);
                 m.responses = replyArray;
                 setMessages(newThreads);
-                console.log(newThreads);
               } catch (error) {
                 console.log(error);
               }
